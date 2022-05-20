@@ -158,13 +158,18 @@ module.exports = function (updatedModules, renewedModules) {
 
 /***/ }),
 /* 3 */
-/***/ ((module, exports, __webpack_require__) => {
+/***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core_1 = __webpack_require__(4);
 const app_module_1 = __webpack_require__(5);
+const dotenv_1 = __importDefault(__webpack_require__(18));
+dotenv_1.default.config();
 async function bootstrap() {
     const app = await core_1.NestFactory.create(app_module_1.AppModule);
     await app.listen(3000);
@@ -457,12 +462,12 @@ let LanguagesController = class LanguagesController {
     constructor(languagesService) {
         this.languagesService = languagesService;
     }
-    getLanguages(username, body) {
+    async getLanguages(username, body) {
         if (body.ingore) {
             return this.languagesService.getConditionalLanguages(username, body.ingore);
         }
         else {
-            return this.languagesService.getLanguages(username);
+            return await this.languagesService.getLanguages(username);
         }
     }
 };
@@ -472,7 +477,7 @@ __decorate([
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object, Object]),
-    __metadata("design:returntype", void 0)
+    __metadata("design:returntype", Promise)
 ], LanguagesController.prototype, "getLanguages", null);
 LanguagesController = __decorate([
     (0, common_1.Controller)('languages'),
@@ -493,15 +498,39 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.LanguagesService = void 0;
 const common_1 = __webpack_require__(6);
+const rest_1 = __webpack_require__(16);
+const axios_1 = __importDefault(__webpack_require__(17));
 let LanguagesService = class LanguagesService {
     getConditionalLanguages(username, ignores) {
         return;
     }
-    getLanguages(username) {
-        return;
+    async getLanguages(username) {
+        return process.env.GIT_TOKEN;
+        const octokit = new rest_1.Octokit({
+            auth: process.env.GIT_TOKEN,
+        });
+        const { data } = await octokit.request('GET /users/{username}/repos', {
+            username: username,
+        });
+        const userResult = {};
+        data.forEach(async (d) => {
+            const langData = await axios_1.default.get(d.languages_url);
+            for (const key in langData) {
+                if (userResult[key]) {
+                    userResult[key] += parseInt(langData[key]);
+                }
+                else {
+                    userResult[key] = parseInt(langData[key]);
+                }
+            }
+        });
+        return userResult;
     }
 };
 LanguagesService = __decorate([
@@ -509,6 +538,27 @@ LanguagesService = __decorate([
 ], LanguagesService);
 exports.LanguagesService = LanguagesService;
 
+
+/***/ }),
+/* 16 */
+/***/ ((module) => {
+
+"use strict";
+module.exports = require("@octokit/rest");
+
+/***/ }),
+/* 17 */
+/***/ ((module) => {
+
+"use strict";
+module.exports = require("axios");
+
+/***/ }),
+/* 18 */
+/***/ ((module) => {
+
+"use strict";
+module.exports = require("dotenv");
 
 /***/ })
 /******/ 	]);
@@ -572,7 +622,7 @@ exports.LanguagesService = LanguagesService;
 /******/ 	
 /******/ 	/* webpack/runtime/getFullHash */
 /******/ 	(() => {
-/******/ 		__webpack_require__.h = () => ("9daa649f265f206cf99b")
+/******/ 		__webpack_require__.h = () => ("dc17dfc2c4427a076c07")
 /******/ 	})();
 /******/ 	
 /******/ 	/* webpack/runtime/hasOwnProperty shorthand */

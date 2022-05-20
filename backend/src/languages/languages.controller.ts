@@ -6,14 +6,14 @@ export class LanguagesController {
   constructor(private readonly languagesService: LanguagesService) {}
 
   @Get()
-  getLanguages(@Param('username') username, @Body() body) {
+  async getLanguages(@Param('username') username, @Body() body) {
     if (body.ingore) {
       return this.languagesService.getConditionalLanguages(
         username,
         body.ingore,
       );
     } else {
-      return this.languagesService.getLanguages(username);
+      return await this.languagesService.getLanguages(username);
     }
   }
 }
