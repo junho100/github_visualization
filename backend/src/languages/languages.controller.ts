@@ -13,7 +13,8 @@ export class LanguagesController {
         body.ingore,
       );
     } else {
-      return await this.languagesService.getLanguages(username);
+      const data = await this.languagesService.getLanguages(username);
+      return data;
     }
   }
 }

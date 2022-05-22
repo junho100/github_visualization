@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Octokit } from '@octokit/rest';
+import { Octokit } from 'octokit';
 import axios from 'axios';
 
 @Injectable()
@@ -9,13 +9,14 @@ export class LanguagesService {
   }
 
   async getLanguages(username) {
-    return process.env.GIT_TOKEN;
     const octokit = new Octokit({
       auth: process.env.GIT_TOKEN,
     });
-    const { data } = await octokit.request('GET /users/{username}/repos', {
+    const response = await octokit.request('GET /users/{username}/repos', {
       username: username,
     });
+    console.log(response);
+    const data = response.data;
     const userResult = {};
     data.forEach(async (d) => {
       const langData = await axios.get(d.languages_url);

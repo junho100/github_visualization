@@ -467,7 +467,8 @@ let LanguagesController = class LanguagesController {
             return this.languagesService.getConditionalLanguages(username, body.ingore);
         }
         else {
-            return await this.languagesService.getLanguages(username);
+            const data = await this.languagesService.getLanguages(username);
+            return data;
         }
     }
 };
@@ -504,20 +505,21 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.LanguagesService = void 0;
 const common_1 = __webpack_require__(6);
-const rest_1 = __webpack_require__(16);
+const octokit_1 = __webpack_require__(16);
 const axios_1 = __importDefault(__webpack_require__(17));
 let LanguagesService = class LanguagesService {
     getConditionalLanguages(username, ignores) {
         return;
     }
     async getLanguages(username) {
-        return process.env.GIT_TOKEN;
-        const octokit = new rest_1.Octokit({
+        const octokit = new octokit_1.Octokit({
             auth: process.env.GIT_TOKEN,
         });
-        const { data } = await octokit.request('GET /users/{username}/repos', {
+        const response = await octokit.request('GET /users/{username}/repos', {
             username: username,
         });
+        console.log(response);
+        const data = response.data;
         const userResult = {};
         data.forEach(async (d) => {
             const langData = await axios_1.default.get(d.languages_url);
@@ -544,7 +546,7 @@ exports.LanguagesService = LanguagesService;
 /***/ ((module) => {
 
 "use strict";
-module.exports = require("@octokit/rest");
+module.exports = require("octokit");
 
 /***/ }),
 /* 17 */
@@ -622,7 +624,7 @@ module.exports = require("dotenv");
 /******/ 	
 /******/ 	/* webpack/runtime/getFullHash */
 /******/ 	(() => {
-/******/ 		__webpack_require__.h = () => ("dc17dfc2c4427a076c07")
+/******/ 		__webpack_require__.h = () => ("3b53fddda22e22050b1f")
 /******/ 	})();
 /******/ 	
 /******/ 	/* webpack/runtime/hasOwnProperty shorthand */
