@@ -474,7 +474,7 @@ let LanguagesController = class LanguagesController {
 };
 __decorate([
     (0, common_1.Get)(),
-    __param(0, (0, common_1.Param)('username')),
+    __param(0, (0, common_1.Query)('username')),
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object, Object]),
@@ -518,18 +518,22 @@ let LanguagesService = class LanguagesService {
         const response = await octokit.request('GET /users/{username}/repos', {
             username: username,
         });
-        console.log(response);
         const data = response.data;
         const userResult = {};
         data.forEach(async (d) => {
-            const langData = await axios_1.default.get(d.languages_url);
-            for (const key in langData) {
-                if (userResult[key]) {
-                    userResult[key] += parseInt(langData[key]);
+            try {
+                const langData = await axios_1.default.get(d.languages_url);
+                for (const key in langData) {
+                    if (userResult[key]) {
+                        userResult[key] += parseInt(langData[key]);
+                    }
+                    else {
+                        userResult[key] = parseInt(langData[key]);
+                    }
                 }
-                else {
-                    userResult[key] = parseInt(langData[key]);
-                }
+            }
+            catch (e) {
+                console.log(e);
             }
         });
         return userResult;
@@ -624,7 +628,7 @@ module.exports = require("dotenv");
 /******/ 	
 /******/ 	/* webpack/runtime/getFullHash */
 /******/ 	(() => {
-/******/ 		__webpack_require__.h = () => ("3b53fddda22e22050b1f")
+/******/ 		__webpack_require__.h = () => ("42028536b6930df848ed")
 /******/ 	})();
 /******/ 	
 /******/ 	/* webpack/runtime/hasOwnProperty shorthand */

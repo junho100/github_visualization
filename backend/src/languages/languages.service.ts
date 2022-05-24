@@ -15,17 +15,20 @@ export class LanguagesService {
     const response = await octokit.request('GET /users/{username}/repos', {
       username: username,
     });
-    console.log(response);
     const data = response.data;
     const userResult = {};
     data.forEach(async (d) => {
-      const langData = await axios.get(d.languages_url);
-      for (const key in langData) {
-        if (userResult[key]) {
-          userResult[key] += parseInt(langData[key]);
-        } else {
-          userResult[key] = parseInt(langData[key]);
+      try {
+        const langData = await axios.get(d.languages_url);
+        for (const key in langData) {
+          if (userResult[key]) {
+            userResult[key] += parseInt(langData[key]);
+          } else {
+            userResult[key] = parseInt(langData[key]);
+          }
         }
+      } catch (e) {
+        console.log(e);
       }
     });
     return userResult;

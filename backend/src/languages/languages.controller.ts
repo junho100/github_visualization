@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param } from '@nestjs/common';
+import { Body, Controller, Get, Param, Query } from '@nestjs/common';
 import { LanguagesService } from './languages.service';
 
 @Controller('languages')
@@ -6,7 +6,7 @@ export class LanguagesController {
   constructor(private readonly languagesService: LanguagesService) {}
 
   @Get()
-  async getLanguages(@Param('username') username, @Body() body) {
+  async getLanguages(@Query('username') username, @Body() body) {
     if (body.ingore) {
       return this.languagesService.getConditionalLanguages(
         username,
