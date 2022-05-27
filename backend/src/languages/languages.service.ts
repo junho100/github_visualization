@@ -1,11 +1,32 @@
 import { Injectable } from '@nestjs/common';
 import { Octokit } from 'octokit';
-import axios from 'axios';
 
 @Injectable()
 export class LanguagesService {
-  getConditionalLanguages(username, ignores) {
-    return;
+  async getConditionalLanguages(username, ignores) {
+    const octokit = new Octokit({
+      auth: process.env.GIT_TOKEN,
+    });
+    const response = await octokit.request('GET /users/{username}/repos', {
+      username: username,
+    });
+    const data = response.data;
+    const userResult = {};
+    for (let i = 0; i < data.length; i++) {
+      const { data: d } = await octokit.request(data[i].languages_url);
+      const dKeys = Object.keys(d);
+      for (let j = 0; j < dKeys.length; j++) {
+        if (Object.keys(userResult).includes(dKeys[j])) {
+          userResult[dKeys[j]] += parseInt(d[dKeys[j]]);
+        } else {
+          if (ignores.includes(dKeys[j])) {
+            continue;
+          }
+          userResult[dKeys[j]] = parseInt(d[dKeys[j]]);
+        }
+      }
+    }
+    return userResult;
   }
 
   async getLanguages(username) {
@@ -17,20 +38,17 @@ export class LanguagesService {
     });
     const data = response.data;
     const userResult = {};
-    data.forEach(async (d) => {
-      try {
-        const langData = await axios.get(d.languages_url);
-        for (const key in langData) {
-          if (userResult[key]) {
-            userResult[key] += parseInt(langData[key]);
-          } else {
-            userResult[key] = parseInt(langData[key]);
-          }
+    for (let i = 0; i < data.length; i++) {
+      const { data: d } = await octokit.request(data[i].languages_url);
+      const dKeys = Object.keys(d);
+      for (let j = 0; j < dKeys.length; j++) {
+        if (Object.keys(userResult).includes(dKeys[j])) {
+          userResult[dKeys[j]] += parseInt(d[dKeys[j]]);
+        } else {
+          userResult[dKeys[j]] = parseInt(d[dKeys[j]]);
         }
-      } catch (e) {
-        console.log(e);
       }
-    });
+    }
     return userResult;
   }
 }

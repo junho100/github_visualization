@@ -168,7 +168,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core_1 = __webpack_require__(4);
 const app_module_1 = __webpack_require__(5);
-const dotenv_1 = __importDefault(__webpack_require__(18));
+const dotenv_1 = __importDefault(__webpack_require__(17));
 dotenv_1.default.config();
 async function bootstrap() {
     const app = await core_1.NestFactory.create(app_module_1.AppModule);
@@ -499,17 +499,36 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.LanguagesService = void 0;
 const common_1 = __webpack_require__(6);
 const octokit_1 = __webpack_require__(16);
-const axios_1 = __importDefault(__webpack_require__(17));
 let LanguagesService = class LanguagesService {
-    getConditionalLanguages(username, ignores) {
-        return;
+    async getConditionalLanguages(username, ignores) {
+        const octokit = new octokit_1.Octokit({
+            auth: process.env.GIT_TOKEN,
+        });
+        const response = await octokit.request('GET /users/{username}/repos', {
+            username: username,
+        });
+        const data = response.data;
+        const userResult = {};
+        for (let i = 0; i < data.length; i++) {
+            const { data: d } = await octokit.request(data[i].languages_url);
+            const dKeys = Object.keys(d);
+            for (let j = 0; j < dKeys.length; j++) {
+                if (Object.keys(userResult).includes(dKeys[j])) {
+                    userResult[dKeys[j]] += parseInt(d[dKeys[j]]);
+                }
+                else {
+                    if (ignores.includes(dKeys[j])) {
+                        continue;
+                    }
+                    userResult[dKeys[j]] = parseInt(d[dKeys[j]]);
+                }
+            }
+        }
+        return userResult;
     }
     async getLanguages(username) {
         const octokit = new octokit_1.Octokit({
@@ -520,22 +539,18 @@ let LanguagesService = class LanguagesService {
         });
         const data = response.data;
         const userResult = {};
-        data.forEach(async (d) => {
-            try {
-                const langData = await axios_1.default.get(d.languages_url);
-                for (const key in langData) {
-                    if (userResult[key]) {
-                        userResult[key] += parseInt(langData[key]);
-                    }
-                    else {
-                        userResult[key] = parseInt(langData[key]);
-                    }
+        for (let i = 0; i < data.length; i++) {
+            const { data: d } = await octokit.request(data[i].languages_url);
+            const dKeys = Object.keys(d);
+            for (let j = 0; j < dKeys.length; j++) {
+                if (Object.keys(userResult).includes(dKeys[j])) {
+                    userResult[dKeys[j]] += parseInt(d[dKeys[j]]);
+                }
+                else {
+                    userResult[dKeys[j]] = parseInt(d[dKeys[j]]);
                 }
             }
-            catch (e) {
-                console.log(e);
-            }
-        });
+        }
         return userResult;
     }
 };
@@ -554,13 +569,6 @@ module.exports = require("octokit");
 
 /***/ }),
 /* 17 */
-/***/ ((module) => {
-
-"use strict";
-module.exports = require("axios");
-
-/***/ }),
-/* 18 */
 /***/ ((module) => {
 
 "use strict";
@@ -628,7 +636,7 @@ module.exports = require("dotenv");
 /******/ 	
 /******/ 	/* webpack/runtime/getFullHash */
 /******/ 	(() => {
-/******/ 		__webpack_require__.h = () => ("42028536b6930df848ed")
+/******/ 		__webpack_require__.h = () => ("a339425923a853830cdb")
 /******/ 	})();
 /******/ 	
 /******/ 	/* webpack/runtime/hasOwnProperty shorthand */
