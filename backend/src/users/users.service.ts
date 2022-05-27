@@ -20,11 +20,11 @@ export class UsersService {
     return users;
   }
 
-  async createUser(username: string) {
+  async createUser(username: string, total: number) {
     const user = new UserEntity();
     user.id = uuid();
     user.username = username;
-    user.total = 2;
+    user.total = total;
 
     await this.userRepository.save(user);
   }

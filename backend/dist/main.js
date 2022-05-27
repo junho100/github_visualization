@@ -203,7 +203,7 @@ const nest_morgan_1 = __webpack_require__(7);
 const app_controller_1 = __webpack_require__(8);
 const app_service_1 = __webpack_require__(9);
 const users_module_1 = __webpack_require__(10);
-const languages_module_1 = __webpack_require__(17);
+const languages_module_1 = __webpack_require__(14);
 const typeorm_1 = __webpack_require__(11);
 const config_1 = __webpack_require__(21);
 const user_entity_1 = __webpack_require__(12);
@@ -328,13 +328,14 @@ exports.UsersModule = void 0;
 const common_1 = __webpack_require__(6);
 const typeorm_1 = __webpack_require__(11);
 const user_entity_1 = __webpack_require__(12);
-const users_controller_1 = __webpack_require__(14);
-const users_service_1 = __webpack_require__(15);
+const languages_module_1 = __webpack_require__(14);
+const users_controller_1 = __webpack_require__(18);
+const users_service_1 = __webpack_require__(19);
 let UsersModule = class UsersModule {
 };
 UsersModule = __decorate([
     (0, common_1.Module)({
-        imports: [typeorm_1.TypeOrmModule.forFeature([user_entity_1.UserEntity])],
+        imports: [typeorm_1.TypeOrmModule.forFeature([user_entity_1.UserEntity]), languages_module_1.LanguagesModule],
         controllers: [users_controller_1.UsersController],
         providers: [users_service_1.UsersService],
     })
@@ -406,46 +407,21 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
-var __metadata = (this && this.__metadata) || function (k, v) {
-    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
-};
-var __param = (this && this.__param) || function (paramIndex, decorator) {
-    return function (target, key) { decorator(target, key, paramIndex); }
-};
-var _a;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.UsersController = void 0;
+exports.LanguagesModule = void 0;
 const common_1 = __webpack_require__(6);
-const users_service_1 = __webpack_require__(15);
-let UsersController = class UsersController {
-    constructor(usersService) {
-        this.usersService = usersService;
-    }
-    getUsers() {
-        return this.usersService.getUsers();
-    }
-    createUser(body) {
-        return this.usersService.createUser(body.username);
-    }
+const languages_controller_1 = __webpack_require__(15);
+const languages_service_1 = __webpack_require__(16);
+let LanguagesModule = class LanguagesModule {
 };
-__decorate([
-    (0, common_1.Get)(),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", []),
-    __metadata("design:returntype", void 0)
-], UsersController.prototype, "getUsers", null);
-__decorate([
-    (0, common_1.Post)(),
-    __param(0, (0, common_1.Body)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object]),
-    __metadata("design:returntype", void 0)
-], UsersController.prototype, "createUser", null);
-UsersController = __decorate([
-    (0, common_1.Controller)('users'),
-    __metadata("design:paramtypes", [typeof (_a = typeof users_service_1.UsersService !== "undefined" && users_service_1.UsersService) === "function" ? _a : Object])
-], UsersController);
-exports.UsersController = UsersController;
+LanguagesModule = __decorate([
+    (0, common_1.Module)({
+        controllers: [languages_controller_1.LanguagesController],
+        providers: [languages_service_1.LanguagesService],
+        exports: [languages_service_1.LanguagesService],
+    })
+], LanguagesModule);
+exports.LanguagesModule = LanguagesModule;
 
 
 /***/ }),
@@ -468,98 +444,9 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 };
 var _a;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.UsersService = void 0;
-const common_1 = __webpack_require__(6);
-const typeorm_1 = __webpack_require__(11);
-const user_entity_1 = __webpack_require__(12);
-const typeorm_2 = __webpack_require__(13);
-const uuid_1 = __webpack_require__(16);
-let UsersService = class UsersService {
-    constructor(userRepository) {
-        this.userRepository = userRepository;
-    }
-    getUsers() {
-        const users = this.userRepository.find({
-            order: {
-                total: 'DESC',
-            },
-        });
-        return users;
-    }
-    async createUser(username) {
-        const user = new user_entity_1.UserEntity();
-        user.id = (0, uuid_1.v4)();
-        user.username = username;
-        user.total = 2;
-        await this.userRepository.save(user);
-    }
-};
-UsersService = __decorate([
-    (0, common_1.Injectable)(),
-    __param(0, (0, typeorm_1.InjectRepository)(user_entity_1.UserEntity)),
-    __metadata("design:paramtypes", [typeof (_a = typeof typeorm_2.Repository !== "undefined" && typeorm_2.Repository) === "function" ? _a : Object])
-], UsersService);
-exports.UsersService = UsersService;
-
-
-/***/ }),
-/* 16 */
-/***/ ((module) => {
-
-"use strict";
-module.exports = require("uuid");
-
-/***/ }),
-/* 17 */
-/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
-
-"use strict";
-
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.LanguagesModule = void 0;
-const common_1 = __webpack_require__(6);
-const languages_controller_1 = __webpack_require__(18);
-const languages_service_1 = __webpack_require__(19);
-let LanguagesModule = class LanguagesModule {
-};
-LanguagesModule = __decorate([
-    (0, common_1.Module)({
-        controllers: [languages_controller_1.LanguagesController],
-        providers: [languages_service_1.LanguagesService],
-    })
-], LanguagesModule);
-exports.LanguagesModule = LanguagesModule;
-
-
-/***/ }),
-/* 18 */
-/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
-
-"use strict";
-
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var __metadata = (this && this.__metadata) || function (k, v) {
-    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
-};
-var __param = (this && this.__param) || function (paramIndex, decorator) {
-    return function (target, key) { decorator(target, key, paramIndex); }
-};
-var _a;
-Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.LanguagesController = void 0;
 const common_1 = __webpack_require__(6);
-const languages_service_1 = __webpack_require__(19);
+const languages_service_1 = __webpack_require__(16);
 let LanguagesController = class LanguagesController {
     constructor(languagesService) {
         this.languagesService = languagesService;
@@ -590,7 +477,7 @@ exports.LanguagesController = LanguagesController;
 
 
 /***/ }),
-/* 19 */
+/* 16 */
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 "use strict";
@@ -604,8 +491,26 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.LanguagesService = void 0;
 const common_1 = __webpack_require__(6);
-const octokit_1 = __webpack_require__(20);
+const octokit_1 = __webpack_require__(17);
 let LanguagesService = class LanguagesService {
+    async getTotalLanguages(username) {
+        const octokit = new octokit_1.Octokit({
+            auth: process.env.GIT_TOKEN,
+        });
+        const response = await octokit.request('GET /users/{username}/repos', {
+            username: username,
+        });
+        const data = response.data;
+        let userTotal = 0;
+        for (let i = 0; i < data.length; i++) {
+            const { data: d } = await octokit.request(data[i].languages_url);
+            const dKeys = Object.keys(d);
+            for (let j = 0; j < dKeys.length; j++) {
+                userTotal += parseInt(d[dKeys[j]]);
+            }
+        }
+        return userTotal;
+    }
     async getConditionalLanguages(username, ignores) {
         const octokit = new octokit_1.Octokit({
             auth: process.env.GIT_TOKEN,
@@ -663,11 +568,130 @@ exports.LanguagesService = LanguagesService;
 
 
 /***/ }),
-/* 20 */
+/* 17 */
 /***/ ((module) => {
 
 "use strict";
 module.exports = require("octokit");
+
+/***/ }),
+/* 18 */
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+"use strict";
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
+var _a, _b;
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.UsersController = void 0;
+const common_1 = __webpack_require__(6);
+const languages_service_1 = __webpack_require__(16);
+const users_service_1 = __webpack_require__(19);
+let UsersController = class UsersController {
+    constructor(usersService, languageService) {
+        this.usersService = usersService;
+        this.languageService = languageService;
+    }
+    getUsers() {
+        return this.usersService.getUsers();
+    }
+    async createUser(body) {
+        const username = body.username;
+        const total = await this.languageService.getTotalLanguages(username);
+        return await this.usersService.createUser(username, total);
+    }
+};
+__decorate([
+    (0, common_1.Get)(),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", void 0)
+], UsersController.prototype, "getUsers", null);
+__decorate([
+    (0, common_1.Post)(),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], UsersController.prototype, "createUser", null);
+UsersController = __decorate([
+    (0, common_1.Controller)('users'),
+    __metadata("design:paramtypes", [typeof (_a = typeof users_service_1.UsersService !== "undefined" && users_service_1.UsersService) === "function" ? _a : Object, typeof (_b = typeof languages_service_1.LanguagesService !== "undefined" && languages_service_1.LanguagesService) === "function" ? _b : Object])
+], UsersController);
+exports.UsersController = UsersController;
+
+
+/***/ }),
+/* 19 */
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+"use strict";
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
+var _a;
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.UsersService = void 0;
+const common_1 = __webpack_require__(6);
+const typeorm_1 = __webpack_require__(11);
+const user_entity_1 = __webpack_require__(12);
+const typeorm_2 = __webpack_require__(13);
+const uuid_1 = __webpack_require__(20);
+let UsersService = class UsersService {
+    constructor(userRepository) {
+        this.userRepository = userRepository;
+    }
+    getUsers() {
+        const users = this.userRepository.find({
+            order: {
+                total: 'DESC',
+            },
+        });
+        return users;
+    }
+    async createUser(username, total) {
+        const user = new user_entity_1.UserEntity();
+        user.id = (0, uuid_1.v4)();
+        user.username = username;
+        user.total = total;
+        await this.userRepository.save(user);
+    }
+};
+UsersService = __decorate([
+    (0, common_1.Injectable)(),
+    __param(0, (0, typeorm_1.InjectRepository)(user_entity_1.UserEntity)),
+    __metadata("design:paramtypes", [typeof (_a = typeof typeorm_2.Repository !== "undefined" && typeorm_2.Repository) === "function" ? _a : Object])
+], UsersService);
+exports.UsersService = UsersService;
+
+
+/***/ }),
+/* 20 */
+/***/ ((module) => {
+
+"use strict";
+module.exports = require("uuid");
 
 /***/ }),
 /* 21 */
@@ -738,7 +762,7 @@ module.exports = require("@nestjs/config");
 /******/ 	
 /******/ 	/* webpack/runtime/getFullHash */
 /******/ 	(() => {
-/******/ 		__webpack_require__.h = () => ("4328aa12d0b9fb5972f1")
+/******/ 		__webpack_require__.h = () => ("8683ec7388d5f8f7e104")
 /******/ 	})();
 /******/ 	
 /******/ 	/* webpack/runtime/hasOwnProperty shorthand */
