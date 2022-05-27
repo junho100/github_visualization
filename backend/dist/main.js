@@ -158,18 +158,13 @@ module.exports = function (updatedModules, renewedModules) {
 
 /***/ }),
 /* 3 */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ ((module, exports, __webpack_require__) => {
 
 "use strict";
 
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core_1 = __webpack_require__(4);
 const app_module_1 = __webpack_require__(5);
-const dotenv_1 = __importDefault(__webpack_require__(17));
-dotenv_1.default.config();
 async function bootstrap() {
     const app = await core_1.NestFactory.create(app_module_1.AppModule);
     await app.listen(3000);
@@ -208,12 +203,32 @@ const nest_morgan_1 = __webpack_require__(7);
 const app_controller_1 = __webpack_require__(8);
 const app_service_1 = __webpack_require__(9);
 const users_module_1 = __webpack_require__(10);
-const languages_module_1 = __webpack_require__(13);
+const languages_module_1 = __webpack_require__(17);
+const typeorm_1 = __webpack_require__(11);
+const config_1 = __webpack_require__(21);
+const user_entity_1 = __webpack_require__(12);
 let AppModule = class AppModule {
 };
 AppModule = __decorate([
     (0, common_1.Module)({
-        imports: [nest_morgan_1.MorganModule, users_module_1.UsersModule, languages_module_1.LanguagesModule],
+        imports: [
+            config_1.ConfigModule.forRoot({
+                isGlobal: true,
+            }),
+            nest_morgan_1.MorganModule,
+            users_module_1.UsersModule,
+            languages_module_1.LanguagesModule,
+            typeorm_1.TypeOrmModule.forRoot({
+                type: 'mysql',
+                host: process.env.DB_HOST,
+                port: parseInt(process.env.DB_PORT),
+                username: process.env.DB_USERNAME,
+                password: process.env.DB_PASSWORD,
+                database: process.env.DB_DATABASE,
+                entities: [user_entity_1.UserEntity],
+                synchronize: true,
+            }),
+        ],
         controllers: [app_controller_1.AppController],
         providers: [
             app_service_1.AppService,
@@ -311,12 +326,15 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.UsersModule = void 0;
 const common_1 = __webpack_require__(6);
-const users_controller_1 = __webpack_require__(11);
-const users_service_1 = __webpack_require__(12);
+const typeorm_1 = __webpack_require__(11);
+const user_entity_1 = __webpack_require__(12);
+const users_controller_1 = __webpack_require__(14);
+const users_service_1 = __webpack_require__(15);
 let UsersModule = class UsersModule {
 };
 UsersModule = __decorate([
     (0, common_1.Module)({
+        imports: [typeorm_1.TypeOrmModule.forFeature([user_entity_1.UserEntity])],
         controllers: [users_controller_1.UsersController],
         providers: [users_service_1.UsersService],
     })
@@ -326,6 +344,58 @@ exports.UsersModule = UsersModule;
 
 /***/ }),
 /* 11 */
+/***/ ((module) => {
+
+"use strict";
+module.exports = require("@nestjs/typeorm");
+
+/***/ }),
+/* 12 */
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+"use strict";
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.UserEntity = void 0;
+const typeorm_1 = __webpack_require__(13);
+let UserEntity = class UserEntity {
+};
+__decorate([
+    (0, typeorm_1.PrimaryColumn)(),
+    __metadata("design:type", String)
+], UserEntity.prototype, "id", void 0);
+__decorate([
+    (0, typeorm_1.Column)(),
+    __metadata("design:type", String)
+], UserEntity.prototype, "username", void 0);
+__decorate([
+    (0, typeorm_1.Column)(),
+    __metadata("design:type", Number)
+], UserEntity.prototype, "total", void 0);
+UserEntity = __decorate([
+    (0, typeorm_1.Entity)()
+], UserEntity);
+exports.UserEntity = UserEntity;
+
+
+/***/ }),
+/* 13 */
+/***/ ((module) => {
+
+"use strict";
+module.exports = require("typeorm");
+
+/***/ }),
+/* 14 */
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 "use strict";
@@ -346,7 +416,7 @@ var _a;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.UsersController = void 0;
 const common_1 = __webpack_require__(6);
-const users_service_1 = __webpack_require__(12);
+const users_service_1 = __webpack_require__(15);
 let UsersController = class UsersController {
     constructor(usersService) {
         this.usersService = usersService;
@@ -379,7 +449,7 @@ exports.UsersController = UsersController;
 
 
 /***/ }),
-/* 12 */
+/* 15 */
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 "use strict";
@@ -390,25 +460,57 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
+var _a;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.UsersService = void 0;
 const common_1 = __webpack_require__(6);
+const typeorm_1 = __webpack_require__(11);
+const user_entity_1 = __webpack_require__(12);
+const typeorm_2 = __webpack_require__(13);
+const uuid_1 = __webpack_require__(16);
 let UsersService = class UsersService {
-    getUsers() {
-        return;
+    constructor(userRepository) {
+        this.userRepository = userRepository;
     }
-    createUser(username) {
-        return;
+    getUsers() {
+        const users = this.userRepository.find({
+            order: {
+                total: 'DESC',
+            },
+        });
+        return users;
+    }
+    async createUser(username) {
+        const user = new user_entity_1.UserEntity();
+        user.id = (0, uuid_1.v4)();
+        user.username = username;
+        user.total = 2;
+        await this.userRepository.save(user);
     }
 };
 UsersService = __decorate([
-    (0, common_1.Injectable)()
+    (0, common_1.Injectable)(),
+    __param(0, (0, typeorm_1.InjectRepository)(user_entity_1.UserEntity)),
+    __metadata("design:paramtypes", [typeof (_a = typeof typeorm_2.Repository !== "undefined" && typeorm_2.Repository) === "function" ? _a : Object])
 ], UsersService);
 exports.UsersService = UsersService;
 
 
 /***/ }),
-/* 13 */
+/* 16 */
+/***/ ((module) => {
+
+"use strict";
+module.exports = require("uuid");
+
+/***/ }),
+/* 17 */
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 "use strict";
@@ -422,8 +524,8 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.LanguagesModule = void 0;
 const common_1 = __webpack_require__(6);
-const languages_controller_1 = __webpack_require__(14);
-const languages_service_1 = __webpack_require__(15);
+const languages_controller_1 = __webpack_require__(18);
+const languages_service_1 = __webpack_require__(19);
 let LanguagesModule = class LanguagesModule {
 };
 LanguagesModule = __decorate([
@@ -436,7 +538,7 @@ exports.LanguagesModule = LanguagesModule;
 
 
 /***/ }),
-/* 14 */
+/* 18 */
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 "use strict";
@@ -457,7 +559,7 @@ var _a;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.LanguagesController = void 0;
 const common_1 = __webpack_require__(6);
-const languages_service_1 = __webpack_require__(15);
+const languages_service_1 = __webpack_require__(19);
 let LanguagesController = class LanguagesController {
     constructor(languagesService) {
         this.languagesService = languagesService;
@@ -488,7 +590,7 @@ exports.LanguagesController = LanguagesController;
 
 
 /***/ }),
-/* 15 */
+/* 19 */
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 "use strict";
@@ -502,7 +604,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.LanguagesService = void 0;
 const common_1 = __webpack_require__(6);
-const octokit_1 = __webpack_require__(16);
+const octokit_1 = __webpack_require__(20);
 let LanguagesService = class LanguagesService {
     async getConditionalLanguages(username, ignores) {
         const octokit = new octokit_1.Octokit({
@@ -561,18 +663,18 @@ exports.LanguagesService = LanguagesService;
 
 
 /***/ }),
-/* 16 */
+/* 20 */
 /***/ ((module) => {
 
 "use strict";
 module.exports = require("octokit");
 
 /***/ }),
-/* 17 */
+/* 21 */
 /***/ ((module) => {
 
 "use strict";
-module.exports = require("dotenv");
+module.exports = require("@nestjs/config");
 
 /***/ })
 /******/ 	]);
@@ -636,7 +738,7 @@ module.exports = require("dotenv");
 /******/ 	
 /******/ 	/* webpack/runtime/getFullHash */
 /******/ 	(() => {
-/******/ 		__webpack_require__.h = () => ("a339425923a853830cdb")
+/******/ 		__webpack_require__.h = () => ("4328aa12d0b9fb5972f1")
 /******/ 	})();
 /******/ 	
 /******/ 	/* webpack/runtime/hasOwnProperty shorthand */
