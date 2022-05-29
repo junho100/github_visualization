@@ -167,7 +167,8 @@ const core_1 = __webpack_require__(4);
 const app_module_1 = __webpack_require__(5);
 async function bootstrap() {
     const app = await core_1.NestFactory.create(app_module_1.AppModule);
-    await app.listen(3000);
+    app.enableCors();
+    await app.listen(8080);
     if (true) {
         module.hot.accept();
         module.hot.dispose(() => app.close());
@@ -762,7 +763,7 @@ module.exports = require("@nestjs/config");
 /******/ 	
 /******/ 	/* webpack/runtime/getFullHash */
 /******/ 	(() => {
-/******/ 		__webpack_require__.h = () => ("8683ec7388d5f8f7e104")
+/******/ 		__webpack_require__.h = () => ("c087f78ba314ba3bcfb2")
 /******/ 	})();
 /******/ 	
 /******/ 	/* webpack/runtime/hasOwnProperty shorthand */
