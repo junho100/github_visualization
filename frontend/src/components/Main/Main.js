@@ -5,56 +5,83 @@ import { Doughnut } from "react-chartjs-2";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 const Main = () => {
-  const [username, setUsername] = useState("");
+  const [usernameInput, setUsernameInput] = useState("");
+  const [presentUsername, setPresentUsername] = useState("");
+  const [languages, setLanguages] = useState({});
+  const [isLoading, setIsLoading] = useState(false);
+
+  const renderLoading = () => {
+    if (isLoading) {
+      return (
+        <img src={process.env.PUBLIC_URL + "/loading.gif"} alt="loading"></img>
+      );
+    } else {
+      return <div></div>;
+    }
+  };
+
+  const renderDounut = () => {
+    const langKeys = Object.keys(languages);
+    const langVals = Object.values(languages);
+    const data = {
+      labels: langKeys,
+      datasets: [
+        {
+          label: "Languages",
+          data: langVals,
+          backgroundColor: [],
+          borderWidth: 1,
+        },
+      ],
+    };
+    for (let i = 0; i < langKeys.length; i++) {
+      const RGB_1 = Math.floor(Math.random() * (255 + 1));
+      const RGB_2 = Math.floor(Math.random() * (255 + 1));
+      const RGB_3 = Math.floor(Math.random() * (255 + 1));
+      const strRGBA = "rgba(" + RGB_1 + "," + RGB_2 + "," + RGB_3 + ",0.3)";
+
+      data.datasets[0].backgroundColor.push(strRGBA);
+    }
+
+    return <Doughnut data={data}></Doughnut>;
+  };
 
   return (
     <div id="main">
       <form
         onSubmit={async (e) => {
           e.preventDefault();
-          const d = await axios.get(
-            `http://localhost:8080/languages?username=${username}`
-          );
-          const content = document.getElementById("content");
-          content.innerText = d;
+          if (usernameInput !== presentUsername) {
+            setIsLoading(true);
+            setLanguages({});
+            setPresentUsername(usernameInput);
+            const d = await axios.get(
+              `http://localhost:8080/languages?username=${usernameInput}`
+            );
+            setLanguages(d.data);
+            setIsLoading(false);
+          }
         }}
       >
         <input
           onChange={(e) => {
-            setUsername(e.target.value);
+            setUsernameInput(e.target.value);
           }}
         ></input>
-        <button>submit</button>
+        <button type="submit">submit</button>
+        <button
+          onClick={(e) => {
+            e.preventDefault();
+            setLanguages({});
+            setPresentUsername("");
+          }}
+        >
+          X
+        </button>
       </form>
       <div id="content">
-        <Doughnut
-          data={{
-            labels: ["Red", "Blue", "Yellow", "Green", "Purple", "Orange"],
-            datasets: [
-              {
-                label: { username },
-                data: [12, 19, 3, 5, 2, 3],
-                backgroundColor: [
-                  "rgba(255, 99, 132, 0.2)",
-                  "rgba(54, 162, 235, 0.2)",
-                  "rgba(255, 206, 86, 0.2)",
-                  "rgba(75, 192, 192, 0.2)",
-                  "rgba(153, 102, 255, 0.2)",
-                  "rgba(255, 159, 64, 0.2)",
-                ],
-                borderColor: [
-                  "rgba(255, 99, 132, 1)",
-                  "rgba(54, 162, 235, 1)",
-                  "rgba(255, 206, 86, 1)",
-                  "rgba(75, 192, 192, 1)",
-                  "rgba(153, 102, 255, 1)",
-                  "rgba(255, 159, 64, 1)",
-                ],
-                borderWidth: 1,
-              },
-            ],
-          }}
-        ></Doughnut>
+        {renderLoading()}
+        {Object.keys(languages).length !== 0 ? renderDounut() : "no user!"}
       </div>
     </div>
   );
