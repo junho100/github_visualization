@@ -56,7 +56,7 @@ const Main = () => {
             setLanguages({});
             setPresentUsername(usernameInput);
             const d = await axios.get(
-              `http://localhost:8080/languages?username=${usernameInput}`
+              `https://git-visualization.herokuapp.com/languages?username=${usernameInput}`
             );
             setLanguages(d.data);
             setIsLoading(false);

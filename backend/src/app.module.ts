@@ -18,12 +18,12 @@ import { UserEntity } from './entities/user.entity';
     UsersModule,
     LanguagesModule,
     TypeOrmModule.forRoot({
-      type: 'mysql',
+      url: process.env.DATABASE_URL,
+      type: 'postgres',
+      ssl: {
+        rejectUnauthorized: false,
+      },
       host: process.env.DB_HOST,
-      port: parseInt(process.env.DB_PORT),
-      username: process.env.DB_USERNAME,
-      password: process.env.DB_PASSWORD,
-      database: process.env.DB_DATABASE,
       entities: [UserEntity],
       synchronize: true,
     }),
